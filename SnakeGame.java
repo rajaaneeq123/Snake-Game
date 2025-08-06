@@ -1,94 +1,85 @@
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import javax.swing.*;
 
 public class SnakeGame extends JPanel implements ActionListener, KeyListener{
 
-    int boardHeight = 400;
-    int boardWidth = 400;
-
-    //snake
-    int snakeX = 0;
-    int snakeY = 0;
-    int snakeWidth = 20;
-    int snakeHeight = 20;
-    class Snake{
-        int x = snakeX;
-        int y = snakeY;
-        int width = snakeWidth;
-        int height = snakeHeight;
-    }
+    int boardSize = 400;
+    int bodySize = 20;
 
 
-    //fruit
-    int fruitX = 200;
-    int fruitY = 200;
-    int fruitWidth = 20;
-    int fruitHeight = 20;
-    class Fruit{
-        int x = fruitX;
-        int y = fruitY;
-        int width = fruitWidth;
-        int height = fruitHeight;
-    }
-
-    //game logic
-    Snake snake;
-    Fruit fruit;
+    //game logic 
     int velocityX = 0;
     int velocityY = 0;
+    Point fruit;
+    ArrayList<Point> snakeBody = new ArrayList<>();
     Timer gameLoop;
 
+
     SnakeGame(){
-        setPreferredSize(new Dimension(boardWidth, boardHeight));
+        setPreferredSize(new Dimension(boardSize, boardSize));
         setBackground(Color.BLACK);
         setFocusable(true);
         addKeyListener(this);
-
-        //snake
-        snake = new Snake();
-
-        //fruit
-        fruit = new Fruit();
 
         //timer
         gameLoop = new Timer(1000/6, this);
         gameLoop.start();
 
+        startGame();
+
     }
 
+    public void startGame(){
+        snakeBody.add(new Point(0,0));
+        System.out.print("Head created");
+
+        generateNewFruit();
+    }
+
+    public void generateNewFruit(){
+        int x = ((int)(Math.random() * 20)) * 20;
+        int y = ((int)(Math.random() * 20)) * 20;
+        
+        fruit = new Point(x, y);
+    }
+    
+    public void move(){
+        Point head = snakeBody.get(0);
+
+        head.x += velocityX;
+        head.y += velocityY;
+        Point newHead = new Point(head.x, head.y);
+        snakeBody.add(0, newHead);
+
+        if(eaten()){
+            generateNewFruit();
+        }else{
+            snakeBody.remove(snakeBody.size()-1);
+        }
+    }
+    
+    public boolean eaten(){
+        return snakeBody.get(0).equals(fruit);
+    }
+    
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         draw(g);
     }
 
     public void draw(Graphics g){
+
         g.setColor(Color.WHITE);
-        g.fillRect(snake.x, snake.y, snake.width, snake.height);
+        for(Point p : snakeBody){
+            g.fillRect(p.x, p.y, bodySize, bodySize);
+        }
 
         g.setColor(Color.RED);
-        g.fillRect(fruit.x, fruit.y, fruit.width, fruit.height);
+        g.fillRect(fruit.x, fruit.y, bodySize, bodySize);
 
-        if(eat()){
-            g.setColor(Color.WHITE);
-            g.fillRect(snake.x, snake.y, snake.width, snake.height);
-            System.out.print("body created");
-        }
-    }
-
-    public void move(){
-        snake.x += velocityX;
-        snake.y += velocityY;
-        if(eat()){
-            fruit.x = ((int)(Math.random() * 20)) * 20;
-            fruit.y = ((int)(Math.random() * 20)) * 20;
-        }
-    }
-
-    public boolean eat(){
-        return  snake.x == fruit.x && 
-                snake.y == fruit.y;
     }
 
     @Override
