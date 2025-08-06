@@ -34,7 +34,6 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener{
 
     public void startGame(){
         snakeBody.add(new Point(0,0));
-        System.out.print("Head created");
 
         generateNewFruit();
     }
@@ -49,9 +48,7 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener{
     public void move(){
         Point head = snakeBody.get(0);
 
-        head.x += velocityX;
-        head.y += velocityY;
-        Point newHead = new Point(head.x, head.y);
+        Point newHead = new Point(head.x + velocityX, head.y + velocityY);
         snakeBody.add(0, newHead);
 
         if(eaten()){
@@ -64,10 +61,25 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener{
     public boolean eaten(){
         return snakeBody.get(0).equals(fruit);
     }
+
+    public void gameOver(){
+        velocityX = 0;
+        velocityY = 0;
+    }
     
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         draw(g);
+    }
+
+    public boolean collision(){
+        Point head = snakeBody.get(0);
+        for(int i = 1; i < snakeBody.size(); i++){
+            if(head.equals(snakeBody.get(i))){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void draw(Graphics g){
@@ -85,22 +97,25 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener{
     @Override
     public void actionPerformed(ActionEvent e) {
         move();
+        if(collision()){
+            gameOver();
+        }
         repaint();
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
-        if(keyCode == KeyEvent.VK_UP){
+        if(keyCode == KeyEvent.VK_UP && velocityY == 0){
             velocityY = -20;
             velocityX = 0;
-        }else if(keyCode == KeyEvent.VK_DOWN){
+        }else if(keyCode == KeyEvent.VK_DOWN && velocityY == 0){
             velocityY = 20;
             velocityX = 0;
-        }else if(keyCode == KeyEvent.VK_LEFT){
+        }else if(keyCode == KeyEvent.VK_LEFT && velocityX == 0){
             velocityX = -20;
             velocityY = 0;
-        }else if(keyCode == KeyEvent.VK_RIGHT){
+        }else if(keyCode == KeyEvent.VK_RIGHT && velocityX == 0){
             velocityX = 20;
             velocityY = 0;
         }
