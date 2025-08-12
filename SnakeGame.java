@@ -79,12 +79,14 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener{
     }
 
     public void gameStart(){
+        snakeBody.add(new Point(60, wallThickness));
+        snakeBody.add(new Point(40, wallThickness));
         snakeBody.add(new Point(20, wallThickness));
         headPositionImg = head_right_img;
-
-        gameLoop.start();
+        tailPositionImg = tail_right_img;
 
         generateNewFruit();
+        gameLoop.start();
     }
 
     public void generateNewFruit(){
@@ -126,8 +128,13 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener{
     } 
     
     public boolean collision(Point head){
+        boolean willGrow = head.equals(fruit);
 
-        for(int i = 0; i < snakeBody.size(); i++){
+        int checkSize = snakeBody.size();
+        if (!willGrow) checkSize-=1;
+
+
+        for(int i = 0; i < checkSize; i++){
             if(head.equals(snakeBody.get(i)) && i != 0){
                 return true;
             }
@@ -234,8 +241,10 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        move();
-        repaint();
+        if(velocityX != 0 || velocityY != 0){
+            move();
+            repaint();
+        }
     }
 
     @Override
